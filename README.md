@@ -6,7 +6,7 @@ markdown editor.
 
 ![vscode](https://img.shields.io/badge/vscode-1.86.1+-blue.svg)
 ![MIT](https://img.shields.io/badge/license-MIT-green.svg)
-![v1.0.0](https://img.shields.io/badge/version-0.0.2-blue.svg)
+![v0.0.3](https://img.shields.io/badge/version-0.0.3-blue.svg)
 
 ![stars](https://img.shields.io/github/stars/jamerrq/checkbox-md-enhancement?style=social)
 ![forks](https://img.shields.io/github/forks/jamerrq/checkbox-md-enhancement?style=social)
@@ -34,6 +34,10 @@ Initial release of Checkbox Enhancement
 
 - Added checkbox counter to the status bar
 - Percentage format added to the counter
+
+### 0.0.3
+
+- Release notes added to the README.md file
 
 ## Contributing
 
