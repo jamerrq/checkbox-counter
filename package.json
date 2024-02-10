@@ -1,5 +1,9 @@
 {
   "name": "checkbox-counter",
+  "author": {
+    "name": "Jamer José",
+    "site": "jamerrq@deno.dev"
+  },
   "displayName": "checkbox-counter",
   "description": "Display and count the progress for your checkboxes in Markdown",
   "version": "0.0.1",
@@ -14,8 +18,12 @@
   "contributes": {
     "commands": [
       {
-        "command": "checkbox-counter.helloWorld",
-        "title": "Hello World"
+        "command": "checkbox-counter.toggleCounter",
+        "title": "Checbox counter: Toggle counter view"
+      },
+      {
+        "command": "checkbox-counter.changeFormat",
+        "title": "Checkbox counter: Change progress format"
       }
     ]
   },
