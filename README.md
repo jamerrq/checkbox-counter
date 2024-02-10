@@ -20,7 +20,7 @@ checkboxes in the markdown file. This counter is displayed in the status bar.
 You can change the format of the counter by clicking on it or executing the
 `Checkbox Enhancement: Change Counter Format` command.
 
-<video controls src="lib/demo.mp4" title="Title"></video>
+https://github.com/jamerrq/checkbox-md-enhancement/assets/35697365/50e085ad-989c-4ca0-a538-8789f476ea95
 
 To show/hide the counter, you can use the `Checkbox Enhancement: Toggle Counter` command.
 
