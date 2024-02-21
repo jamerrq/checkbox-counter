@@ -2,12 +2,16 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 
+// Colors for the status bar item
+const COLORS = ["pink", "orange", "yellow", "green"];
+
 let myStatusBarItem: vscode.StatusBarItem;
-let percentage = false;
+const config = vscode.workspace.getConfiguration("md-checkbox-enhancement");
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+
   // Use the console to output diagnostic information (console.log) and errors (console.error)
   // This line of code will only be executed once when your extension is
   // activated
@@ -18,70 +22,97 @@ export function activate(context: vscode.ExtensionContext) {
     100
   );
 
-  // if the item is clicked, toggle the percentage
-  const changeFormatId = "checkbox-counter.changeFormat";
+  const bindedUpdateStatusBarItem = updateStatusBarItem.bind(null, context);
+
+  // Change format command
+  // Toggle between percentage, counter and both
+  const changeFormatId = "md-checkbox-enhancement.changeFormat";
   context.subscriptions.push(
     vscode.commands.registerCommand(changeFormatId, () => {
-      percentage = !percentage;
-      updateStatusBarItem();
+      // toggle the format
+      const format = context.globalState.get("format");
+      if (format === "percentage") {
+        context.globalState.update("format", "counter");
+        config.update("format", "counter");
+      } else if (format === "counter") {
+        context.globalState.update("format", "both");
+        config.update("format", "both");
+      } else {
+        context.globalState.update("format", "percentage");
+        config.update("format", "percentage");
+      }
+      bindedUpdateStatusBarItem();
     })
   );
+
+  // Toggle visibility command
+  const toggleVisibilityId = "md-checkbox-enhancement.toggleVisibility";
+  context.subscriptions.push(
+    vscode.commands.registerCommand(toggleVisibilityId, () => {
+      const visible = context.globalState.get("visible");
+      context.globalState.update("visible", !visible);
+      bindedUpdateStatusBarItem();
+    })
+  );
+
+  bindedUpdateStatusBarItem();
+  context.subscriptions.push(
+    vscode.window.onDidChangeActiveTextEditor(bindedUpdateStatusBarItem)
+  );
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeTextDocument(bindedUpdateStatusBarItem)
+  );
   myStatusBarItem.command = changeFormatId;
-  myStatusBarItem.color = "orange";
-
   context.subscriptions.push(myStatusBarItem);
-
-  // The command has been defined in the package.json file
-  // Now provide the implementation of the command with registerCommand
-  // The commandId parameter must match the command field in package.json
-  let disposable = vscode.commands.registerCommand(
-    "checkbox-counter.toggleCounter",
-    () => {
-      // The code you place here will be executed every time your command is
-      // executed
-
-      // Get the active text editor
-      const editor = vscode.window.activeTextEditor;
-      if (!editor) {
-        vscode.window.showInformationMessage("No active text editor found");
-        return; // No open text editor
-      }
-
-      // If was already visible, hide it
-      if (context.workspaceState.get("checkbox-counter:visible")) {
-        myStatusBarItem.hide();
-        context.workspaceState.update("checkbox-counter:visible", false);
-        return;
-      } else {
-        updateStatusBarItem();
-        context.workspaceState.update("checkbox-counter:visible", true);
-      }
-    }
-  );
-
-  updateStatusBarItem();
-  context.subscriptions.push(disposable);
-  context.subscriptions.push(
-    vscode.window.onDidChangeActiveTextEditor(updateStatusBarItem)
-  );
-  context.subscriptions.push(
-    vscode.workspace.onDidChangeTextDocument(updateStatusBarItem)
-  );
 }
 
-function updateStatusBarItem(): void {
+function updateStatusBarItem(context: vscode.ExtensionContext): void {
   const editor = vscode.window.activeTextEditor;
-  if (!editor) {
-    myStatusBarItem.hide();
-    return;
+  // if (!editor) {
+  //   myStatusBarItem.hide();
+  //   return;
+  // }
+  const format = context.globalState.get("format");
+  myStatusBarItem.text = `$(checklist) ${getRatioOfBoxes(editor, context)}`;
+  myStatusBarItem.tooltip = "Click to toggle the format";
+  // set the color of the status bar item according to the percentage
+  const bindedGetRatioOfBoxes = getRatioOfBoxes.bind(null, editor, context);
+  const ratio = bindedGetRatioOfBoxes();
+  let percentage;
+  if (format === "percentage") {
+    percentage = parseInt(ratio.split("%")[0]);
+  } else {
+    const [checked, total] = ratio.split("/");
+    percentage = Math.round((parseInt(checked) / parseInt(total)) * 100);
   }
-  myStatusBarItem.text = `$(checklist) ${getRatioOfBoxes(editor)}`;
-  myStatusBarItem.show();
+  if (percentage < 25) {
+    myStatusBarItem.color = COLORS[0];
+  } else if (percentage < 50) {
+    myStatusBarItem.color = COLORS[1];
+  } else if (percentage < 75) {
+    myStatusBarItem.color = COLORS[2];
+  } else {
+    myStatusBarItem.color = COLORS[3];
+  }
+  const visible = context.globalState.get("visible");
+  if (visible) {
+    myStatusBarItem.show();
+  } else {
+    myStatusBarItem.hide();
+  }
 }
 
-function getRatioOfBoxes(editor: vscode.TextEditor | undefined): string {
+function getRatioOfBoxes(editor: vscode.TextEditor | undefined, context: vscode.ExtensionContext): string {
+  const format = context.globalState.get("format");
   if (!editor) {
-    return percentage ? "0%" : "0/0";
+    switch (format) {
+      case "percentage":
+        return "0%";
+      case "counter":
+        return "0/0";
+      default:
+        return "0/0 (0%)";
+    }
   }
   const doc = editor.document;
   let total = 0;
@@ -95,12 +126,15 @@ function getRatioOfBoxes(editor: vscode.TextEditor | undefined): string {
       total++;
     }
   }
-  //   return `${checked}/${total}`;
-  // if the format is set to percentage then return the percentage
-  if (percentage) {
-    return `${Math.round((checked / total) * 100)}%`;
+  const percentageFormat = total === 0 ? "0%" : `${Math.round((checked / total) * 100)}%`;
+  const countFormat = `${checked}/${total}`;
+  if (format === "percentage") {
+    return percentageFormat;
+  } else if (format === "counter") {
+    return countFormat;
+  } else {
+    return `${countFormat} (${percentageFormat})`;
   }
-  return `${checked}/${total}`;
 }
 
 // This method is called when your extension is deactivated

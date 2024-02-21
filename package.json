@@ -1,5 +1,5 @@
 {
-  "name": "checkbox-counter",
+  "name": "md-checkbox-enhancement",
   "author": {
     "name": "Jamer José",
     "site": "jamerrq@deno.dev"
@@ -30,19 +30,41 @@
   "bugs": {
     "url": "https://github.com/jamerrq/checkbox-md-enhancement/issues"
   },
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "checkbox-counter.toggleCounter",
+        "command": "md-checkbox-enhancement.toggleVisibility",
         "title": "Checbox Enhancement: Toggle counter view"
       },
       {
-        "command": "checkbox-counter.changeFormat",
+        "command": "md-checkbox-enhancement.changeFormat",
         "title": "Checkbox Enhancement: Change progress format"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Checkbox Enhancement",
+      "properties": {
+        "md-checkbox-enhancement.format": {
+          "type": "string",
+          "default": "percentage",
+          "enum": [
+            "percentage",
+            "fraction",
+            "both"
+          ],
+          "description": "The format to display the progress of the checkboxes"
+        },
+        "md-checkbox-enhancement.visible": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the counter view"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "pnpm run package",
