@@ -14,7 +14,7 @@ while also solving a problem that I have. I hope you find it useful too.
 
 ![vscode](https://img.shields.io/badge/vscode-1.86.1+-blue.svg)
 ![MIT](https://img.shields.io/badge/license-MIT-green.svg)
-![v0.0.5](https://img.shields.io/badge/version-0.0.5-blue.svg)
+![v0.0.5](https://img.shields.io/badge/version-0.0.6-blue.svg)
 
 ## Features
 
@@ -99,3 +99,7 @@ When you are done, you can open a pull request on the GitHub repository.
 
 * [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
 * [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+
+## About the Author
+
+[![og-image](https://jamerrq.deno.dev/og-image2.png)](https://jamerrq.deno.dev/)
